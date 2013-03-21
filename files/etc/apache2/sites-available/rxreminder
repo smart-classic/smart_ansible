@@ -1,0 +1,25 @@
+<VirtualHost *:9003>
+	ServerAdmin admin@localhost
+
+	DocumentRoot /home/smart/smart_sample_apps/rx_reminder
+	ServerName localhost
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride All
+	</Directory>
+	<Directory /home/smart/smart_sample_apps/rx_reminder/>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	ErrorLog /var/log/apache2/rxreminder.bugs.log
+
+	
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+	CustomLog /var/log/apache2/rxreminder.log combined
+
+</VirtualHost>

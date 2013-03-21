@@ -1,0 +1,242 @@
+---
+# TODO: change /bin/sh from dash to bash
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  tasks:
+    - action: group name=$username
+    - action: user name=$username group=$username groups=sudo password=$password
+    - action: copy
+              src=files/etc/sudoers
+              dest=/etc/sudoers
+              owner=root group=root mode=0440
+    # the credentials specified in the ~smart/.pgpass
+    # must be the same as those specified in the
+    # DATABASE_{USER,PASSWORD} parameters in
+    # smart_{server,ui_server,sample_apps}/settings.py
+    - action: copy
+              src=files/home/$username/.pgpass
+              dest=/home/$username/.pgpass
+              owner=$username group=$username mode=0600
+    - action: apt pkg=python-psycopg2 update_cache=yes
+    - action: apt pkg=python-m2crypto
+    - action: apt pkg=python-simplejson
+    # provided by python2.7
+    #- action: apt pkg=python-argparse
+    - action: apt pkg=python-setuptools
+    - action: apt pkg=python-pyparsing
+    - action: apt pkg=python-django
+    - action: command easy_install -U "rdflib==$rdflib_version" "rdfextras==$rdfextras_version"
+    - action: apt pkg=postgresql
+    - action: apt pkg=git
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  sudo: yes
+  sudo_user: postgres
+  tasks:
+    - action: service name=postgresql state=started
+    - action: command pg_dropcluster --stop $postgresql_version main
+    - action: command pg_createcluster --start -e UTF-8 $postgresql_version main
+    - action: postgresql_user user=$username password=$username role_attr_flags=SUPERUSER
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  tasks:
+    - action: copy
+              src=files/etc/postgresql/$postgresql_version/main/pg_hba.conf
+              dest=/etc/postgresql/$postgresql_version/main/pg_hba.conf
+              owner=postgres group=postgres mode=0640
+      notify:
+        - restart postgresql
+  handlers:
+    - name: restart postgresql
+      action: service name=postgresql state=restarted
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  tasks:
+    - action: apt pkg=tomcat7
+    - action: service name=tomcat7 state=stopped
+    - action: get_url
+              url=http://downloads.sourceforge.net/project/sesame/Sesame%202/$sesame_version/openrdf-sesame-${sesame_version}-sdk.tar.gz
+              dest=/home/$username/openrdf-sesame-${sesame_version}-sdk.tar.gz
+              owner=$username group=$username mode=0640
+      sudo: yes
+      sudo_user: $username
+    - action: command
+              chdir=/home/$username
+              tar -xzvf openrdf-sesame-${sesame_version}-sdk.tar.gz
+      sudo: yes
+      sudo_user: $username
+    - action: file
+              path=/usr/share/tomcat7/.aduna
+              state=absent
+    - action: file
+              path=/usr/share/tomcat7/.aduna
+              owner=tomcat7 group=tomcat7 mode=0755 state=directory
+    - action: shell
+              chdir=/home/$username
+              cp -f openrdf-sesame-$sesame_version/war/* /var/lib/tomcat7/webapps
+    - action: service name=tomcat7 state=started
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  sudo: yes
+  sudo_user: $username
+  tasks:
+    # setup smart_server
+    - action: command
+              chdir=/home/$username
+              creates=/home/$username/smart_server
+              git clone --recursive https://github.com/chb/smart_server.git
+    - action: fetch
+              src=/home/$username/smart_server/settings.py.default
+              dest=templates
+              fail_on_missing=yes
+    - action: template
+              src=templates/$ansible_ssh_host/home/$username/smart_server/settings.py.default
+              dest=/home/$username/smart_server/settings.py
+              owner=$username group=$username mode=0644
+    - action: command
+              chdir=/home/$username/smart_server
+              creates=/home/$username/smart_server/bootstrap_helpers/application_list.json
+              cp
+              bootstrap_helpers/application_list.json.default
+              bootstrap_helpers/application_list.json
+    - action: command
+              chdir=/home/$username/smart_server
+              creates=/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
+              cp
+              bootstrap_helpers/bootstrap_applications.py.default
+              bootstrap_helpers/bootstrap_applications.py
+    # setup smart_ui_server
+    - action: command
+              chdir=/home/$username
+              creates=/home/$username/smart_ui_server
+              git clone --recursive https://github.com/chb/smart_ui_server.git
+    - action: fetch
+              src=/home/$username/smart_ui_server/settings.py.default
+              dest=templates
+              fail_on_missing=yes
+    - action: template
+              src=templates/$ansible_ssh_host/home/$username/smart_ui_server/settings.py.default
+              dest=/home/$username/smart_ui_server/settings.py
+              owner=$username group=$username mode=0644
+    # setup smart_sample_apps
+    - action: command
+              chdir=/home/$username
+              creates=/home/$username/smart_sample_apps
+              git clone --recursive https://github.com/chb/smart_sample_apps.git
+    - action: fetch
+              src=/home/$username/smart_sample_apps/settings.py.default
+              dest=templates
+              fail_on_missing=yes
+    - action: template
+              src=templates/$ansible_ssh_host/home/$username/smart_sample_apps/settings.py.default
+              dest=/home/$username/smart_sample_apps/settings.py
+              owner=$username group=$username mode=0644
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  tasks:
+    - action: apt pkg=apache2
+    - action: apt pkg=libapache2-mod-python
+    - action: apt pkg=libapache2-mod-wsgi
+    - action: service name=apache2 state=stopped
+    - action: copy
+              src=files/etc/apache2/ports.conf
+              dest=/etc/apache2/ports.conf
+              owner=root group=root mode=0644
+    - action: copy
+              src=files/etc/apache2/sites-available/api-verify
+              dest=/etc/apache2/sites-available/api-verify
+              owner=root group=root mode=0644
+    - action: copy
+              src=files/etc/apache2/sites-available/mpr-monitor
+              dest=/etc/apache2/sites-available/mpr-monitor
+              owner=root group=root mode=0644
+    - action: copy
+              src=files/etc/apache2/sites-available/rxreminder
+              dest=/etc/apache2/sites-available/rxreminder
+              owner=root group=root mode=0644
+    - action: copy
+              src=files/etc/apache2/sites-available/smart-servers
+              dest=/etc/apache2/sites-available/smart-servers
+              owner=root group=root mode=0644
+    - action: file
+              src=/etc/apache2/mods-available/rewrite.load
+              path=/etc/apache2/mods-enabled/rewrite.load
+              owner=root group=root state=link
+    - action: file
+              path=/etc/apache2/sites-enabled/000-default
+              state=absent
+    - action: file
+              src=/etc/apache2/sites-available/smart-servers
+              path=/etc/apache2/sites-enabled/001-smart-servers
+              owner=root group=root state=link
+    - action: file
+              src=/etc/apache2/sites-available/api-verify
+              path=/etc/apache2/sites-enabled/002-api-verify
+              owner=root group=root state=link
+    - action: file
+              src=/etc/apache2/sites-available/mpr-monitor
+              path=/etc/apache2/sites-enabled/003-mpr-monitor
+              owner=root group=root state=link
+    - action: file
+              src=/etc/apache2/sites-available/rxreminder
+              path=/etc/apache2/sites-enabled/004-rxreminder
+              owner=root group=root state=link
+    - action: service name=apache2 state=started
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  sudo: yes
+  sudo_user: $username
+  tasks:
+    - action: command
+              chdir=/home/$username/smart_server
+              /home/$username/smart_server/reset.sh
+    - action: command
+              chdir=/home/$username/smart_ui_server
+              /home/$username/smart_ui_server/reset.sh
+
+- hosts: all
+  vars_files:
+    - vars.yml
+  user: root
+  sudo: yes
+  sudo_user: $username
+  tasks:
+    # setup smart_sample_patients
+    - action: command
+              chdir=/home/$username
+              creates=/home/$username/smart_sample_patients
+              git clone --recursive https://github.com/chb/smart_sample_patients.git
+    - action: file
+              path=/home/$username/smart_sample_patients/test-data
+              owner=$username group=$username mode=0755 state=directory
+    # obiously this shouldn't reference a specific patient file
+    # need a better mechanism for idempotency here
+    - action: command
+              chdir=/home/$username/smart_sample_patients/bin
+              creates=/home/$username/smart_sample_patients/test-data/p1032702.xml
+              python generate.py --write ../test-data
+    - action: shell
+              chdir=/home/$username/smart_server
+              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
+              python load_tools/load_one_patient.py
+              /home/$username/smart_sample_patients/test-data/*

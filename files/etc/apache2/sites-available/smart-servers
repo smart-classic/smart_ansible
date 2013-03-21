@@ -1,0 +1,67 @@
+WSGIPassAuthorization On
+NameVirtualHost *:7001
+NameVirtualHost *:7000
+NameVirtualHost *:8001
+
+<VirtualHost *:7001>
+        ServerName localhost
+        ServerAdmin admin@localhost
+
+        ErrorLog /var/log/apache2/error.smart_ui.log      
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel debug
+        CustomLog /var/log/apache2/access.log combined
+
+        Alias /static/ /home/smart/smart_ui_server/ui/static/
+        <Directory /home/smart/smart_sample_apps/static/framework/>
+        Order deny,allow
+        Allow from all
+        </Directory>
+
+        DocumentRoot /home/smart/smart_ui_server
+        WSGIScriptAlias / /home/smart/smart_ui_server/django.wsgi
+        WSGIApplicationGroup %{GLOBAL}
+	WSGIDaemonProcess direct-smart-ui user=smart
+	WSGIProcessGroup direct-smart-ui
+</VirtualHost>
+
+
+<VirtualHost *:7000>
+	ServerName localhost
+	ServerAdmin admin@localhost
+
+	ErrorLog /var/log/apache2/error.smart_server.log	
+	LogLevel debug
+	CustomLog /var/log/apache2/access.log combined
+
+	DocumentRoot /home/smart/smart_server
+	WSGIScriptAlias / /home/smart/smart_server/django.wsgi
+	WSGIApplicationGroup %{GLOBAL}
+	WSGIDaemonProcess direct-smart-server user=smart
+	WSGIProcessGroup direct-smart-server
+</VirtualHost>
+
+
+<VirtualHost *:8001>
+	ServerName localhost
+	ServerAdmin admin@localhost
+
+	ErrorLog /var/log/apache2/error.smart_apps.log	
+	LogLevel warn
+	CustomLog /var/log/apache2/access.log combined
+
+
+	Alias /framework/ /home/smart/smart_sample_apps/static/framework/
+	<Directory /home/smart/smart_sample_apps/static/framework/>
+	Order deny,allow
+	Allow from all
+	</Directory>
+
+	DocumentRoot /home/smart/smart_sample_apps
+	WSGIScriptAlias / /home/smart/smart_sample_apps/django.wsgi
+	WSGIApplicationGroup %{GLOBAL}
+	WSGIDaemonProcess direct-smart-apps user=smart
+	WSGIProcessGroup direct-smart-apps
+</VirtualHost>

@@ -1,0 +1,29 @@
+---
+#hostname: 134.174.151.46
+hostname: localhost
+username: smart
+password: smLdEYw5NOy2k
+rdflib_version: 3.2.3
+rdfextras_version: 0.2
+postgresql_version: 9.1
+sesame_version: 2.6.9
+api_server_base_url: http://$hostname:7000
+app_server_base_url: http://$hostname:8001
+chrome_consumer: chrome
+chrome_secret: chrome
+path_to_smart_sample_apps: /home/$username/smart_sample_apps
+path_to_smart_server: /home/$username/smart_server
+path_to_smart_ui_server: /home/$username/smart_ui_server
+#proxy_base_url
+#proxy_error_message_override
+#proxy_notification_from
+#proxy_notification_smtp_server
+#proxy_notification_subject
+#proxy_notification_to
+#proxy_user_email
+triplestore_endpoint: http://$hostname:8080/openrdf-sesame/repositories/record_rdf
+triplestore_engine: sesame
+#triplestore_password
+#triplestore_username
+ui_server_base_url: http://$hostname:7001
+use_proxy: False
