@@ -5,6 +5,9 @@
     - vars.yml
   sudo: yes
   tasks:
+    - action: fail
+              msg="This playbook can only be run on an Ubuntu 12.04 system"
+      only_if: "'$ansible_distribution' == 'Ubuntu' and '$ansible_distribution_version' == '12.04'"
     - action: group name=$username
     - action: user name=$username group=$username groups=sudo password=$password
     - action: copy
