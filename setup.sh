@@ -26,6 +26,15 @@ do
   fi
 done
 
+sudo -k
+sudo -n /bin/true 2>/dev/null
+RC=$?
+if [ $RC -ne 0 ]
+then
+  echo "passwordless sudo is not enabled: $RC" >&2
+  return 1
+fi
+
 if [ ! -d $ANSIBLE_HOME ]
 then
   git clone $ANSIBLE_REPO $ANSIBLE_HOME

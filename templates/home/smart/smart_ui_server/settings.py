@@ -1,0 +1,87 @@
+# Django settings for smart_ui_server project.
+
+APP_HOME = '{{path_to_smart_ui_server}}'
+
+SMART_API_SERVER_BASE = '{{api_server_base_url}}'
+CONSUMER_KEY='{{chrome_consumer}}'
+CONSUMER_SECRET='{{chrome_secret}}'
+
+# To allow admin interface, define admin users here and uncomment
+# uncomment admin_ui in the INSTALLED_APPS list below.
+# ADMIN_USER_ID = ('admin@smartplatforms.org',)
+
+DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'smart-ui'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'smart'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'smart'         # Not used with sqlite3.
+
+
+HIDE_GET_MORE_APPS = False
+
+DEBUG = True
+DEBUG_PROPAGATE_EXCEPTIONS = True
+
+# Configuration for IndivoClient (note: UI server is a 'chrome' app. see docs for more)
+
+# Proxy user configuration for full screen apps, showcase, etc
+# PROXY_USER = "proxyuser@smartplatforms.org"
+# PROXY_PASSWORD = "password"
+
+#  quick and dirty private labeling
+BRANDING = {
+  'short_name': 'smart',
+  'pretty_name': 'SMART Reference EMR',
+  'pretty_name_prepend': '',
+  'header_template': 'ui/header_gpp.html',
+  'footer_template': 'ui/footer_smart.html'
+}
+
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# If running in a Windows environment this must be set to the same as your
+# system time zone.
+TIME_ZONE = 'UTC'
+
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en-us'
+
+SITE_ID = 1
+
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
+
+# Make this unique, and don't share it with anybody. (Used by django for CSRF protection?)
+SECRET_KEY = '2342342345'
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.load_template_source',
+    'django.template.loaders.app_directories.load_template_source'
+)
+
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'smart_ui_server.middlewares.reseed_random.ReseedRandom',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+)
+
+ROOT_URLCONF = 'smart_ui_server.ui.urls'
+
+CONCURRENT_THREADING = False
+INSTALLED_APPS = (
+    'django_concurrent_test_server',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'ui',
+# to enable admin ui, uncomment the line below.
+#   'admin_ui',
+)
+
+# use file based sessions for now - fixme: security?
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = APP_HOME + "/session"

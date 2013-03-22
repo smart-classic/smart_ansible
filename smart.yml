@@ -3,9 +3,16 @@
 - hosts: all
   vars_files:
     - vars.yml
+  tasks:
+    - name: check that passwordless sudo is enabled
+      action: sudo_passwordless
+
+- hosts: all
+  vars_files:
+    - vars.yml
   sudo: yes
   tasks:
-    - name: check that we are running on $distro $distro_version
+    - name: fail if we are not running on $distro $distro_version
       action: fail
               msg="This playbook can only be run on an $distro $distro_version system"
       only_if: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
@@ -104,37 +111,25 @@
               chdir=/home/$username
               creates=/home/$username/smart_server
               git clone --recursive https://github.com/chb/smart_server.git
-    - action: fetch
-              src=/home/$username/smart_server/settings.py.default
-              dest=templates
-              fail_on_missing=yes
     - action: template
-              src=templates/localhost/home/$username/smart_server/settings.py.default
+              src=templates/home/$username/smart_server/settings.py
               dest=/home/$username/smart_server/settings.py
               owner=$username group=$username mode=0644
-    - action: command
-              chdir=/home/$username/smart_server
-              creates=/home/$username/smart_server/bootstrap_helpers/application_list.json
-              cp
-              bootstrap_helpers/application_list.json.default
-              bootstrap_helpers/application_list.json
-    - action: command
-              chdir=/home/$username/smart_server
-              creates=/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
-              cp
-              bootstrap_helpers/bootstrap_applications.py.default
-              bootstrap_helpers/bootstrap_applications.py
+    - action: template
+              src=templates/home/$username/smart_server/bootstrap_helpers/application_list.json
+              dest=/home/$username/smart_server/bootstrap_helpers/application_list.json
+              owner=$username group=$username mode=0644
+    - action: template
+              src=templates/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
+              dest=/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
+              owner=$username group=$username mode=0644
     # setup smart_ui_server
     - action: command
               chdir=/home/$username
               creates=/home/$username/smart_ui_server
               git clone --recursive https://github.com/chb/smart_ui_server.git
-    - action: fetch
-              src=/home/$username/smart_ui_server/settings.py.default
-              dest=templates
-              fail_on_missing=yes
     - action: template
-              src=templates/localhost/home/$username/smart_ui_server/settings.py.default
+              src=templates/home/$username/smart_ui_server/settings.py
               dest=/home/$username/smart_ui_server/settings.py
               owner=$username group=$username mode=0644
     # setup smart_sample_apps
@@ -142,12 +137,8 @@
               chdir=/home/$username
               creates=/home/$username/smart_sample_apps
               git clone --recursive https://github.com/chb/smart_sample_apps.git
-    - action: fetch
-              src=/home/$username/smart_sample_apps/settings.py.default
-              dest=templates
-              fail_on_missing=yes
     - action: template
-              src=templates/localhost/home/$username/smart_sample_apps/settings.py.default
+              src=templates/home/$username/smart_sample_apps/settings.py
               dest=/home/$username/smart_sample_apps/settings.py
               owner=$username group=$username mode=0644
 
@@ -164,20 +155,20 @@
               src=files/etc/apache2/ports.conf
               dest=/etc/apache2/ports.conf
               owner=root group=root mode=0644
-    - action: copy
-              src=files/etc/apache2/sites-available/api-verify
+    - action: template
+              src=templates/etc/apache2/sites-available/api-verify
               dest=/etc/apache2/sites-available/api-verify
               owner=root group=root mode=0644
-    - action: copy
-              src=files/etc/apache2/sites-available/mpr-monitor
+    - action: template
+              src=templates/etc/apache2/sites-available/mpr-monitor
               dest=/etc/apache2/sites-available/mpr-monitor
               owner=root group=root mode=0644
-    - action: copy
-              src=files/etc/apache2/sites-available/rxreminder
+    - action: template
+              src=templates/etc/apache2/sites-available/rxreminder
               dest=/etc/apache2/sites-available/rxreminder
               owner=root group=root mode=0644
-    - action: copy
-              src=files/etc/apache2/sites-available/smart-servers
+    - action: template
+              src=templates/etc/apache2/sites-available/smart-servers
               dest=/etc/apache2/sites-available/smart-servers
               owner=root group=root mode=0644
     - action: file

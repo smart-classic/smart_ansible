@@ -2,15 +2,15 @@ WSGIPassAuthorization On
 NameVirtualHost *:9002
 
 <VirtualHost *:9002>
-        ServerName localhost
-        ServerAdmin admin@localhost
+        ServerName {{hostname}}
+        ServerAdmin admin@{{hostname}}
 
         ErrorLog /var/log/apache2/error.mpr-monitor.log
         LogLevel debug
         CustomLog /var/log/apache2/access.log combined
 
-        DocumentRoot /home/smart/smart_sample_apps/mpr_monitor
-        WSGIScriptAlias / /home/smart/smart_sample_apps/mpr_monitor/django.wsgi
+        DocumentRoot {{path_to_smart_sample_apps}}/mpr_monitor
+        WSGIScriptAlias / {{path_to_smart_sample_apps}}/mpr_monitor/django.wsgi
         WSGIApplicationGroup %{GLOBAL}
         WSGIDaemonProcess mpr-monitor user=smart
         WSGIProcessGroup mpr-monitor

@@ -1,13 +1,13 @@
 <VirtualHost *:9003>
-	ServerAdmin admin@localhost
+	ServerName {{hostname}}
+	ServerAdmin admin@{{hostname}}
 
-	DocumentRoot /home/smart/smart_sample_apps/rx_reminder
-	ServerName localhost
+	DocumentRoot {{path_to_smart_sample_apps}}/rx_reminder
 	<Directory />
 		Options FollowSymLinks
 		AllowOverride All
 	</Directory>
-	<Directory /home/smart/smart_sample_apps/rx_reminder/>
+	<Directory {{path_to_smart_sample_apps}}/rx_reminder/>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride All
 		Order allow,deny
