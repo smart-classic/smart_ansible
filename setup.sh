@@ -43,18 +43,6 @@ then
   fi
 fi
 
-ssh \
-  -o "PasswordAuthentication=no" \
-  -o "StrictHostKeyChecking=no" \
-  root@localhost \
-  : >/dev/null 2>&1
-
-if [ $? -ne 0 ]
-then
-  echo "please add $USER's ssh public key to /root/.ssh/authorized_keys" >&2
-  return 1
-fi
-
 export MANPATH=$ANSIBLE_HOME/docs/man:$MANPATH
 
 if [ -d "$DIRNAME/library" ]

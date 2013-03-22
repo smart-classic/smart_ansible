@@ -3,7 +3,7 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
+  sudo: yes
   tasks:
     - action: group name=$username
     - action: user name=$username group=$username groups=sudo password=$password
@@ -34,7 +34,6 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
   sudo: yes
   sudo_user: postgres
   tasks:
@@ -46,7 +45,7 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
+  sudo: yes
   tasks:
     - action: copy
               src=files/etc/postgresql/$postgresql_version/main/pg_hba.conf
@@ -61,7 +60,7 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
+  sudo: yes
   tasks:
     - action: apt pkg=tomcat7
     - action: service name=tomcat7 state=stopped
@@ -90,7 +89,6 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
   sudo: yes
   sudo_user: $username
   tasks:
@@ -104,7 +102,7 @@
               dest=templates
               fail_on_missing=yes
     - action: template
-              src=templates/$ansible_ssh_host/home/$username/smart_server/settings.py.default
+              src=templates/localhost/home/$username/smart_server/settings.py.default
               dest=/home/$username/smart_server/settings.py
               owner=$username group=$username mode=0644
     - action: command
@@ -129,7 +127,7 @@
               dest=templates
               fail_on_missing=yes
     - action: template
-              src=templates/$ansible_ssh_host/home/$username/smart_ui_server/settings.py.default
+              src=templates/localhost/home/$username/smart_ui_server/settings.py.default
               dest=/home/$username/smart_ui_server/settings.py
               owner=$username group=$username mode=0644
     # setup smart_sample_apps
@@ -142,14 +140,14 @@
               dest=templates
               fail_on_missing=yes
     - action: template
-              src=templates/$ansible_ssh_host/home/$username/smart_sample_apps/settings.py.default
+              src=templates/localhost/home/$username/smart_sample_apps/settings.py.default
               dest=/home/$username/smart_sample_apps/settings.py
               owner=$username group=$username mode=0644
 
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
+  sudo: yes
   tasks:
     - action: apt pkg=apache2
     - action: apt pkg=libapache2-mod-python
@@ -203,7 +201,6 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
   sudo: yes
   sudo_user: $username
   tasks:
@@ -217,7 +214,6 @@
 - hosts: all
   vars_files:
     - vars.yml
-  user: root
   sudo: yes
   sudo_user: $username
   tasks:
