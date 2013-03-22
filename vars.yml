@@ -1,4 +1,6 @@
 ---
+distro: Ubuntu
+distro_version: 12.04
 #hostname: 134.174.151.46
 hostname: localhost
 username: smart

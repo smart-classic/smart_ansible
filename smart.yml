@@ -5,11 +5,15 @@
     - vars.yml
   sudo: yes
   tasks:
-    - action: fail
-              msg="This playbook can only be run on an Ubuntu 12.04 system"
-      only_if: "'$ansible_distribution' == 'Ubuntu' and '$ansible_distribution_version' == '12.04'"
+    - name: check that we are running on $distro $distro_version
+      action: fail
+              msg="This playbook can only be run on an $distro $distro_version system"
+      only_if: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
     - action: group name=$username
-    - action: user name=$username group=$username groups=sudo password=$password
+    - action: user
+              name=$username password=$password
+              group=$username groups=sudo
+              shell=/bin/bash
     - action: copy
               src=files/etc/sudoers
               dest=/etc/sudoers
