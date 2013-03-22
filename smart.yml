@@ -4,6 +4,14 @@
   vars_files:
     - vars.yml
   tasks:
+    - name: fail if no hostname variable was specified
+      action: fail
+              msg="no hostname variable was specified"
+      when_unset: $hostname
+    - name: fail if we are not running on $distro $distro_version
+      action: fail
+              msg="this must be run on an $distro $distro_version system"
+      only_if: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
     - name: check that passwordless sudo is enabled
       action: sudo_passwordless
 
@@ -12,10 +20,6 @@
     - vars.yml
   sudo: yes
   tasks:
-    - name: fail if we are not running on $distro $distro_version
-      action: fail
-              msg="This playbook can only be run on an $distro $distro_version system"
-      only_if: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
     - action: group name=$username
     - action: user
               name=$username password=$password
@@ -30,8 +34,8 @@
     # DATABASE_{USER,PASSWORD} parameters in
     # smart_{server,ui_server,sample_apps}/settings.py
     - action: copy
-              src=files/home/$username/.pgpass
-              dest=/home/$username/.pgpass
+              src=files/$userhome/.pgpass
+              dest=$userhome/.pgpass
               owner=$username group=$username mode=0600
     - action: apt pkg=python-psycopg2 update_cache=yes
     - action: apt pkg=python-m2crypto
@@ -80,12 +84,12 @@
     - action: service name=tomcat7 state=stopped
     - action: get_url
               url=http://downloads.sourceforge.net/project/sesame/Sesame%202/$sesame_version/openrdf-sesame-${sesame_version}-sdk.tar.gz
-              dest=/home/$username/openrdf-sesame-${sesame_version}-sdk.tar.gz
+              dest=$userhome/openrdf-sesame-${sesame_version}-sdk.tar.gz
               owner=$username group=$username mode=0640
       sudo: yes
       sudo_user: $username
     - action: command
-              chdir=/home/$username
+              chdir=$userhome
               tar -xzvf openrdf-sesame-${sesame_version}-sdk.tar.gz
       sudo: yes
       sudo_user: $username
@@ -96,7 +100,7 @@
               path=/usr/share/tomcat7/.aduna
               owner=tomcat7 group=tomcat7 mode=0755 state=directory
     - action: shell
-              chdir=/home/$username
+              chdir=$userhome
               cp -f openrdf-sesame-$sesame_version/war/* /var/lib/tomcat7/webapps
     - action: service name=tomcat7 state=started
 
@@ -108,38 +112,35 @@
   tasks:
     # setup smart_server
     - action: command
-              chdir=/home/$username
-              creates=/home/$username/smart_server
-              git clone --recursive https://github.com/chb/smart_server.git
+              creates=$path_to_smart_server
+              git clone --recursive $smart_server_repo_url $path_to_smart_server
     - action: template
-              src=templates/home/$username/smart_server/settings.py
-              dest=/home/$username/smart_server/settings.py
+              src=templates/$path_to_smart_server/settings.py
+              dest=$path_to_smart_server/settings.py
               owner=$username group=$username mode=0644
     - action: template
-              src=templates/home/$username/smart_server/bootstrap_helpers/application_list.json
-              dest=/home/$username/smart_server/bootstrap_helpers/application_list.json
+              src=templates/$path_to_smart_server/bootstrap_helpers/application_list.json
+              dest=$path_to_smart_server/bootstrap_helpers/application_list.json
               owner=$username group=$username mode=0644
     - action: template
-              src=templates/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
-              dest=/home/$username/smart_server/bootstrap_helpers/bootstrap_applications.py
+              src=templates/$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
+              dest=$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
               owner=$username group=$username mode=0644
     # setup smart_ui_server
     - action: command
-              chdir=/home/$username
-              creates=/home/$username/smart_ui_server
-              git clone --recursive https://github.com/chb/smart_ui_server.git
+              creates=$path_to_smart_ui_server
+              git clone --recursive $smart_ui_server_repo_url $path_to_smart_ui_server
     - action: template
-              src=templates/home/$username/smart_ui_server/settings.py
-              dest=/home/$username/smart_ui_server/settings.py
+              src=templates/$path_to_smart_ui_server/settings.py
+              dest=$path_to_smart_ui_server/settings.py
               owner=$username group=$username mode=0644
     # setup smart_sample_apps
     - action: command
-              chdir=/home/$username
-              creates=/home/$username/smart_sample_apps
-              git clone --recursive https://github.com/chb/smart_sample_apps.git
+              creates=$path_to_smart_sample_apps
+              git clone --recursive $smart_sample_apps_repo_url $path_to_smart_sample_apps
     - action: template
-              src=templates/home/$username/smart_sample_apps/settings.py
-              dest=/home/$username/smart_sample_apps/settings.py
+              src=templates/$path_to_smart_sample_apps/settings.py
+              dest=$path_to_smart_sample_apps/settings.py
               owner=$username group=$username mode=0644
 
 - hosts: all
@@ -203,11 +204,11 @@
   sudo_user: $username
   tasks:
     - action: command
-              chdir=/home/$username/smart_server
-              /home/$username/smart_server/reset.sh
+              chdir=$path_to_smart_server
+              $path_to_smart_server/reset.sh
     - action: command
-              chdir=/home/$username/smart_ui_server
-              /home/$username/smart_ui_server/reset.sh
+              chdir=$path_to_smart_ui_server
+              $path_to_smart_ui_server/reset.sh
 
 - hosts: all
   vars_files:
@@ -217,20 +218,19 @@
   tasks:
     # setup smart_sample_patients
     - action: command
-              chdir=/home/$username
-              creates=/home/$username/smart_sample_patients
-              git clone --recursive https://github.com/chb/smart_sample_patients.git
+              creates=$path_to_smart_sample_patients
+              git clone --recursive $smart_sample_patients_repo_url $path_to_smart_sample_patients
     - action: file
-              path=/home/$username/smart_sample_patients/test-data
+              path=$path_to_smart_sample_patients/generated-data
               owner=$username group=$username mode=0755 state=directory
     # obiously this shouldn't reference a specific patient file
     # need a better mechanism for idempotency here
     - action: command
-              chdir=/home/$username/smart_sample_patients/bin
-              creates=/home/$username/smart_sample_patients/test-data/p1032702.xml
-              python generate.py --write ../test-data
+              chdir=$path_to_smart_sample_patients/bin
+              creates=$path_to_smart_sample_patients/generated-data/p1032702.xml
+              python generate.py --write ../generated-data
     - action: shell
-              chdir=/home/$username/smart_server
+              chdir=$path_to_smart_server
               PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
               python load_tools/load_one_patient.py
-              /home/$username/smart_sample_patients/test-data/*
+              $path_to_smart_sample_patients/generated-data/*

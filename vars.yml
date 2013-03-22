@@ -2,20 +2,26 @@
 distro: Ubuntu
 distro_version: 12.04
 #hostname: 134.174.151.46
-hostname: localhost
+#hostname: localhost
 username: smart
 password: smLdEYw5NOy2k
+userhome: /home/$username
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
 postgresql_version: 9.1
 sesame_version: 2.6.9
+smart_server_repo_url: https://github.com/chb/smart_server.git
+smart_ui_server_repo_url: https://github.com/chb/smart_ui_server.git
+smart_sample_apps_repo_url: https://github.com/chb/smart_sample_apps.git
+smart_sample_patients_repo_url: https://github.com/chb/smart_sample_patients.git
 api_server_base_url: http://$hostname:7000
 app_server_base_url: http://$hostname:8001
 chrome_consumer: chrome
 chrome_secret: chrome
-path_to_smart_sample_apps: /home/$username/smart_sample_apps
-path_to_smart_server: /home/$username/smart_server
-path_to_smart_ui_server: /home/$username/smart_ui_server
+path_to_smart_sample_apps: $userhome/smart_sample_apps
+path_to_smart_sample_patients: $userhome/smart_sample_patients
+path_to_smart_server: $userhome/smart_server
+path_to_smart_ui_server: $userhome/smart_ui_server
 #proxy_base_url
 #proxy_error_message_override
 #proxy_notification_from
