@@ -56,5 +56,4 @@ export PATH=$ANSIBLE_HOME/bin:$PATH
 
 export PYTHONPATH=$ANSIBLE_HOME/lib:$PYTHONPATH
 
-echo "localhost ansible_ssh_host=localhost" >| "$DIRNAME/hosts"
 export ANSIBLE_HOSTS="$DIRNAME/hosts"
