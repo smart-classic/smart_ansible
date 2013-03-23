@@ -6,6 +6,12 @@ then
   exit 1
 fi
 
+if ! grep -qi '^ubuntu 12.04' /etc/issue.net
+then
+  echo "this script must be run on an Ubuntu 12.04 system" >&2
+  return 1
+fi
+
 BASENAME="$( basename ${BASH_SOURCE[0]} )"
 DIRNAME="$( cd $( dirname ${BASH_SOURCE[0]} ); pwd )"
 
