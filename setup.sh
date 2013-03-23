@@ -52,7 +52,10 @@ then
   fi
 fi
 
-export MANPATH=$ANSIBLE_HOME/docs/man:$MANPATH
+if ! echo $MANPATH | grep -q "$ANSIBLE_HOME/docs/man"
+then
+  export MANPATH=$ANSIBLE_HOME/docs/man:$MANPATH
+fi
 
 if [ -d "$DIRNAME/library" ]
 then
@@ -61,8 +64,14 @@ else
   export ANSIBLE_LIBRARY=$ANSIBLE_HOME/library
 fi
 
-export PATH=$ANSIBLE_HOME/bin:$PATH
+if ! echo $PATH | grep -q "$ANSIBLE_HOME/bin"
+then
+  export PATH=$ANSIBLE_HOME/bin:$PATH
+fi
 
-export PYTHONPATH=$ANSIBLE_HOME/lib:$PYTHONPATH
+if ! echo $PYTHONPATH | grep -q "$ANSIBLE_HOME/lib"
+then
+  export PYTHONPATH=$ANSIBLE_HOME/lib:$PYTHONPATH
+fi
 
 export ANSIBLE_HOSTS="$DIRNAME/hosts"
