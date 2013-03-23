@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$0" != "-bash" ]
+if [ "$0" != "-bash" -a "$0" != "-/bin/bash" ]
 then
   echo "this script must be sourced from a bash shell" >&2
   exit 1

@@ -1,10 +1,30 @@
 ---
+
+### the following variables may be customized prior to running the
+### playbook.  the only variable that must be specified is hostname.
+
+# the DNS name or IP address of the server onto which SMART is being
+# installed
+#hostname: localhost
+
+# the UNIX-crypted password for the system user under which SMART is
+# installed.  the default here is 'smart' with a salt of 'smart'.
+password: smLdEYw5NOy2k
+
+# the consumer secret for OAuth
+chrome_secret: chrome
+
+# the PostgreSQL database password for the smart and smart-ui
+# databases
+db_password: smart
+
+### the following variables are not likely to change frequently but
+### may be customized if necessary.
+
 distro: Ubuntu
 distro_version: 12.04
 #hostname: 134.174.151.46
-#hostname: localhost
 username: smart
-password: smLdEYw5NOy2k
 userhome: /home/$username
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
@@ -18,7 +38,6 @@ api_server_base_url: http://$hostname:7000
 ui_server_base_url: http://$hostname:7001
 app_server_base_url: http://$hostname:8001
 chrome_consumer: chrome
-chrome_secret: chrome
 path_to_smart_sample_apps: $userhome/smart_sample_apps
 path_to_smart_sample_patients: $userhome/smart_sample_patients
 path_to_smart_server: $userhome/smart_server
