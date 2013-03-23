@@ -29,12 +29,8 @@
               src=files/etc/sudoers
               dest=/etc/sudoers
               owner=root group=root mode=0440
-    # the credentials specified in the ~smart/.pgpass
-    # must be the same as those specified in the
-    # DATABASE_{USER,PASSWORD} parameters in
-    # smart_{server,ui_server,sample_apps}/settings.py
-    - action: copy
-              src=files/$userhome/.pgpass
+    - action: template
+              src=templates/$userhome/.pgpass
               dest=$userhome/.pgpass
               owner=$username group=$username mode=0600
     - action: apt pkg=python-psycopg2 update_cache=yes
