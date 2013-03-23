@@ -17,7 +17,7 @@ for PKG in \
 do
   if ! dpkg -l $PKG >/dev/null 2>&1
   then
-    sudo aptitude install $PKG
+    sudo aptitude -y install $PKG
     if [ $? -ne 0 ]
     then
       echo "an error occurred while installing package $PKG: $?" >&2
