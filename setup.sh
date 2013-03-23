@@ -31,7 +31,7 @@ sudo -n /bin/true 2>/dev/null
 RC=$?
 if [ $RC -ne 0 ]
 then
-  echo "passwordless sudo is not enabled: $RC" >&2
+  echo "password-less sudo is not enabled: $RC" >&2
   return 1
 fi
 
