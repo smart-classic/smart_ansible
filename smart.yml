@@ -41,7 +41,7 @@
     - action: apt pkg=python-setuptools
     - action: apt pkg=python-pyparsing
     - action: apt pkg=python-django
-    - action: command easy_install -U "rdflib==$rdflib_version" "rdfextras==$rdfextras_version"
+    - action: command easy_install -U "rdflib==$rdflib_version" "rdfextras==$rdfextras_version" "jsonschema==$jsonschema_version" httplib2
     - action: apt pkg=postgresql
     - action: apt pkg=git
 
