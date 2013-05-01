@@ -6,6 +6,7 @@
 # the DNS name or IP address of the server onto which SMART is being
 # installed
 #hostname: localhost
+#hostname: 134.174.151.46
 
 # the UNIX-crypted password for the system user under which SMART is
 # installed.  the default here is 'smart' with a salt of 'smart'.
@@ -23,7 +24,6 @@ db_password: smart
 
 distro: Ubuntu
 distro_version: 12.04
-#hostname: 134.174.151.46
 username: smart
 userhome: /home/$username
 rdflib_version: 3.2.3
