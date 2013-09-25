@@ -12,7 +12,7 @@
     - name: fail if we are not running on the correct linux distribution
       action: fail
               msg="this must be run on an $distro $distro_version system"
-      only_if: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
+      when: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
     - name: check that passwordless sudo is enabled
       action: sudo_passwordless
 
