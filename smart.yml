@@ -8,7 +8,7 @@
     - name: fail if no hostname variable was specified
       action: fail
               msg="no hostname variable was specified"
-      when_unset: $hostname
+      when: hostname is not defined
     - name: fail if we are not running on the correct linux distribution
       action: fail
               msg="this must be run on an $distro $distro_version system"
