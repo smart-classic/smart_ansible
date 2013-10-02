@@ -2,12 +2,15 @@ import os
 # Django settings for smart project.
 
 # SMART container descriptors
-VERSION = '0.5.1'
+VERSION = '0.6.1'
 NAME = 'SMART v%s Sandbox' % VERSION
 DESCRIPTION = 'Public sandbox to demonstrate the SMART API'
 
 # base URL for the app
 APP_HOME = '{{path_to_smart_server}}'
+
+# base Documents path (for Documents API file storage location)
+BASE_DOCUMENTS_PATH = APP_HOME + "/documents"
 
 # SMART API Server base URL
 SITE_URL_PREFIX = '{{api_server_base_url}}' # e.g. http://localhost:7000
@@ -23,17 +26,17 @@ PROXY_USER_ID = '{{proxy_user_email}}' # only needed if running in PROXY MODE
 PROXY_BASE = '{{proxy_base_url}}' # only needed if running in PROXY MODE
 
 PROXY_ERROR_NOTIFICATION = False
-PROXY_NOTIFICATION_FROM = '{{proxy_notification_from}}'
-PROXY_NOTIFICATION_TO = '{{proxy_notification_to}}'
-PROXY_NOTIFICATION_SUBJECT = '{{proxy_notification_subject}}'
-PROXY_NOTIFICATION_SMTP_SERVER = '{{proxy_notification_smtp_server}}'
-PROXY_ERROR_MESSAGE_OVERRIDE = '{{proxy_error_message_override}}'
+PROXY_NOTIFICATION_FROM = ''
+PROXY_NOTIFICATION_TO = ''
+PROXY_NOTIFICATION_SUBJECT = ''
+PROXY_NOTIFICATION_SMTP_SERVER = ''
+PROXY_ERROR_MESSAGE_OVERRIDE = ''
 
 TRIPLESTORE = {
         'engine': '{{triplestore_engine}}',
         'record_endpoint': '{{triplestore_endpoint}}',
-        'username': '{{triplestore_username}}',
-        'password': '{{triplestore_password}}'
+        'username': '',
+        'password': ''
         }
 
 ONTOLOGY_FILE = os.path.join(APP_HOME, "smart/document_processing/schema/smart.owl")
@@ -53,7 +56,7 @@ EMAIL_SUPPORT_ADDRESS = "e-mail-support-address@host.com"
 DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'smart'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'smart'             # Not used with sqlite3.
-DATABASE_PASSWORD = '{{db_password}}'         # Not used with sqlite3.
+DATABASE_PASSWORD = 'smart'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
