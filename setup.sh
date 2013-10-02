@@ -17,6 +17,7 @@ DIRNAME="$( cd $( dirname ${BASH_SOURCE[0]} ); pwd )"
 
 ANSIBLE_REPO="git://github.com/ansible/ansible.git"
 ANSIBLE_HOME="/var/tmp/ansible"
+ANSIBLE_VERSION_TAG="v1.3.2"
 
 for PKG in \
   git python python-jinja2 python-paramiko python-yaml sudo
@@ -44,6 +45,9 @@ fi
 if [ ! -d $ANSIBLE_HOME ]
 then
   git clone $ANSIBLE_REPO $ANSIBLE_HOME
+  cd $ANSIBLE_HOME
+  git checkout $ANSIBLE_VERSION_TAG
+  
   if [ $? -ne 0 ]
   then
     echo "clone of ansible repository failed: $?" >&2
