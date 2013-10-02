@@ -47,7 +47,7 @@ then
   git clone $ANSIBLE_REPO $ANSIBLE_HOME
   cd $ANSIBLE_HOME
   git checkout $ANSIBLE_VERSION_TAG
-  
+  cd $DIRNAME
   if [ $? -ne 0 ]
   then
     echo "clone of ansible repository failed: $?" >&2
