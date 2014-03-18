@@ -29,6 +29,7 @@ userhome: /home/$username
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
 jsonschema_version: 0.7
+httplib2_version: 0.8
 postgresql_version: 9.1
 sesame_version: 2.6.9
 smart_server_repo_url: https://github.com/chb/smart_server.git
