@@ -1,6 +1,6 @@
 ---
 # TODO: change /bin/sh from dash to bash
-- name: Check Prerequisites
+- name: CHECK PREREQUISITES
   hosts: all
   vars_files:
     - vars.yml
@@ -14,7 +14,7 @@
     - name: Passwordless sudo is Enabled
       action: sudo_passwordless
 
-- name: Setup user/group
+- name: SETUP USER/GROUP
   hosts: all
   vars_files:
     - vars.yml
@@ -35,7 +35,7 @@
                 dest=$userhome/.pgpass
                 owner=$username group=$username mode=0600
       
-- name: Install Required Packages
+- name: INSTALL REQUIRED PACKAGES
   hosts: all
   vars_files:
     - vars.yml
@@ -62,7 +62,7 @@
     - name: "Install Python Packages: rdflib, rdfextras, jsonschema, httplib2"
       command: easy_install -U "rdflib==$rdflib_version" "rdfextras==$rdfextras_version" "jsonschema==$jsonschema_version" "httplib2==$httplib2_version"
 
-- name: Setup and Configure PostgreSQL
+- name: SETUP POSTGRESQL
   hosts: all
   vars_files:
     - vars.yml
@@ -89,7 +89,7 @@
     - name: Restart PostgreSQL
       service: name=postgresql state=restarted
 
-- name: Setup OpenRDF Sesame on Tomcat
+- name: INSTALL OPENRDF SESAME AND TOMCAT
   hosts: all
   vars_files:
     - vars.yml
@@ -121,7 +121,7 @@
     - name: Restart Tomcat
       service: name=tomcat7 state=restarted
 
-- name: setup smart servers
+- name: SETUP SMART SERVERS
   hosts: all
   vars_files:
     - vars.yml
@@ -129,134 +129,114 @@
   sudo_user: $username
   tasks:
     # setup smart_server
-    - name: clone smart_server git repository
-      action: command
-              creates=$path_to_smart_server
-              git clone --recursive $smart_server_repo_url $path_to_smart_server
-    - name: install smart_server settings file
-      action: template
-              src=templates/$path_to_smart_server/settings.py
-              dest=$path_to_smart_server/settings.py
-              owner=$username group=$username mode=0644
-    - name: install smart_server application list
-      action: template
-              src=templates/$path_to_smart_server/bootstrap_helpers/application_list.json
-              dest=$path_to_smart_server/bootstrap_helpers/application_list.json
-              owner=$username group=$username mode=0644
-    - name: install smart_server bootstrap applications
-      action: template
-              src=templates/$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
-              dest=$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
-              owner=$username group=$username mode=0644
+    - name: Download SMART API Server
+      command: creates=$path_to_smart_server
+               git clone --recursive $smart_server_repo_url $path_to_smart_server
+    - name: Configure SMART API Server
+      template: src=templates/$path_to_smart_server/settings.py
+                dest=$path_to_smart_server/settings.py
+                owner=$username group=$username mode=0644
+    - name: Configure Application List
+      template: src=templates/$path_to_smart_server/bootstrap_helpers/application_list.json
+                dest=$path_to_smart_server/bootstrap_helpers/application_list.json
+                owner=$username group=$username mode=0644
+    - name: Configure Bootstrap Applications
+      template: src=templates/$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
+                dest=$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
+                owner=$username group=$username mode=0644
     # setup smart_ui_server
-    - name: clone smart_ui_server git repository
-      action: command
-              creates=$path_to_smart_ui_server
-              git clone --recursive $smart_ui_server_repo_url $path_to_smart_ui_server
-    - name: install smart_ui_server settings file
-      action: template
-              src=templates/$path_to_smart_ui_server/settings.py
-              dest=$path_to_smart_ui_server/settings.py
-              owner=$username group=$username mode=0644
+    - name: Download SMART UI Server
+      command: creates=$path_to_smart_ui_server
+               git clone --recursive $smart_ui_server_repo_url $path_to_smart_ui_server
+    - name: Configure SMART UI Server
+      template: src=templates/$path_to_smart_ui_server/settings.py
+                dest=$path_to_smart_ui_server/settings.py
+                owner=$username group=$username mode=0644
     # setup smart_sample_apps
-    - name: clone smart_sample_apps git repository
-      action: command
-              creates=$path_to_smart_sample_apps
-              git clone --recursive $smart_sample_apps_repo_url $path_to_smart_sample_apps
-    - name: install smart_sample_apps settings file
-      action: template
-              src=templates/$path_to_smart_sample_apps/settings.py
-              dest=$path_to_smart_sample_apps/settings.py
-              owner=$username group=$username mode=0644
+    - name: Download SMART Sample Apps
+      command: creates=$path_to_smart_sample_apps
+               git clone --recursive $smart_sample_apps_repo_url $path_to_smart_sample_apps
+    - name: Configure SMART Sample Apps Server
+      template: src=templates/$path_to_smart_sample_apps/settings.py
+                dest=$path_to_smart_sample_apps/settings.py
+                owner=$username group=$username mode=0644
 
-- name: install and configure apache httpd
+- name: SETUP APACHE
   hosts: all
   vars_files:
     - vars.yml
   sudo: yes
   tasks:
-    - name: install package apache2
-      action: apt pkg=apache2
-    - name: install package libapache2-mod-python
-      action: apt pkg=libapache2-mod-python
-    - name: install package libapache2-mod-wsgi
-      action: apt pkg=libapache2-mod-wsgi
-    - name: stop apache service
-      action: service name=apache2 state=stopped
-    - name: install apache ports configuration file
-      action: copy
-              src=files/etc/apache2/ports.conf
-              dest=/etc/apache2/ports.conf
-              owner=root group=root mode=0644
-    - name: install api-verify app virtual host configuration file
-      action: template
-              src=templates/etc/apache2/sites-available/api-verify
-              dest=/etc/apache2/sites-available/api-verify
-              owner=root group=root mode=0644
-    - name: install mpr-monitor app virtual host configuration file
-      action: template
-              src=templates/etc/apache2/sites-available/mpr-monitor
-              dest=/etc/apache2/sites-available/mpr-monitor
-              owner=root group=root mode=0644
-    - name: install rxreminder app virtual host configuration file
-      action: template
-              src=templates/etc/apache2/sites-available/rxreminder
-              dest=/etc/apache2/sites-available/rxreminder
-              owner=root group=root mode=0644
-    - name: install smart-servers virtual host configuration file
-      action: template
-              src=templates/etc/apache2/sites-available/smart-servers
-              dest=/etc/apache2/sites-available/smart-servers
-              owner=root group=root mode=0644
-    - name: enable rewrite module
-      action: file
-              src=/etc/apache2/mods-available/rewrite.load
-              path=/etc/apache2/mods-enabled/rewrite.load
-              owner=root group=root state=link
-    - name: disable default virtual host
-      action: file
-              path=/etc/apache2/sites-enabled/000-default
-              state=absent
-    - name: enable smart-servers virtual host
-      action: file
-              src=/etc/apache2/sites-available/smart-servers
-              path=/etc/apache2/sites-enabled/001-smart-servers
-              owner=root group=root state=link
-    - name: enable api-verify app virtual host
-      action: file
-              src=/etc/apache2/sites-available/api-verify
-              path=/etc/apache2/sites-enabled/002-api-verify
-              owner=root group=root state=link
-    - name: enable mpr-monitor app virtual host
-      action: file
-              src=/etc/apache2/sites-available/mpr-monitor
-              path=/etc/apache2/sites-enabled/003-mpr-monitor
-              owner=root group=root state=link
-    - name: enable rxreminder app virtual host
-      action: file
-              src=/etc/apache2/sites-available/rxreminder
-              path=/etc/apache2/sites-enabled/004-rxreminder
-              owner=root group=root state=link
-    - name: start apache service
-      action: service name=apache2 state=started
+    - name: Install Apache
+      apt: pkg=apache2
+    - name: Install Package libapache2-mod-python
+      apt: pkg=libapache2-mod-python
+    - name: Install Package libapache2-mod-wsgi
+      apt: pkg=libapache2-mod-wsgi
+    - name: Configure Apache Ports
+      copy: src=files/etc/apache2/ports.conf
+            dest=/etc/apache2/ports.conf
+            owner=root group=root mode=0644
+    - name: Setup Virtual Host for API Verifier App
+      template: src=templates/etc/apache2/sites-available/api-verify
+                dest=/etc/apache2/sites-available/api-verify
+                owner=root group=root mode=0644
+    - name: Setup Virtual Host for MPR Monitor App
+      template: src=templates/etc/apache2/sites-available/mpr-monitor
+                dest=/etc/apache2/sites-available/mpr-monitor
+                owner=root group=root mode=0644
+#    - name: install rxreminder app virtual host configuration file
+#      template: src=templates/etc/apache2/sites-available/rxreminder
+#                dest=/etc/apache2/sites-available/rxreminder
+#                owner=root group=root mode=0644
+    - name: Setup Virtual Host for SMART Servers
+      template: src=templates/etc/apache2/sites-available/smart-servers
+                dest=/etc/apache2/sites-available/smart-servers
+                owner=root group=root mode=0644
+    - name: Enable mod_rewrite
+      file: src=/etc/apache2/mods-available/rewrite.load
+            path=/etc/apache2/mods-enabled/rewrite.load
+            owner=root group=root state=link
+    - name: Disable Default Virtual Host
+      file: path=/etc/apache2/sites-enabled/000-default
+            state=absent
+    - name: Enable Virtual Host for SMART Servers
+      file: src=/etc/apache2/sites-available/smart-servers
+            path=/etc/apache2/sites-enabled/001-smart-servers
+            owner=root group=root state=link
+    - name: Enable Virtual Host for API Verifier
+      file: src=/etc/apache2/sites-available/api-verify
+            path=/etc/apache2/sites-enabled/002-api-verify
+            owner=root group=root state=link
+    - name: Enable Virtual Host for MPR Monitor
+      file: src=/etc/apache2/sites-available/mpr-monitor
+            path=/etc/apache2/sites-enabled/003-mpr-monitor
+            owner=root group=root state=link
+#    - name: Enable Virtual Host for RX Reminder
+#      file: src=/etc/apache2/sites-available/rxreminder
+#            path=/etc/apache2/sites-enabled/004-rxreminder
+#            owner=root group=root state=link
+      notify:
+        - Restart Apache
+  handlers:
+    - name: Restart Apache
+      service: name=apache2 state=restarted
 
-- name: reset smart_server and smart_ui_server
+- name: RESET SMART SERVERS
   hosts: all
   vars_files:
     - vars.yml
   sudo: yes
   sudo_user: $username
   tasks:
-    - name: run smart_server reset script
-      action: command
-              chdir=$path_to_smart_server
-              $path_to_smart_server/reset.sh
-    - name: run smart_ui_server reset script
-      action: command
-              chdir=$path_to_smart_ui_server
-              $path_to_smart_ui_server/reset.sh
+    - name: Reset SMART API Server
+      command: chdir=$path_to_smart_server
+               $path_to_smart_server/reset.sh
+    - name: Reset SMART UI Server
+      command: chdir=$path_to_smart_ui_server
+               $path_to_smart_ui_server/reset.sh
 
-- name: generate and load smart sample patient data
+- name: LOAD SAMPLE PATIENTS
   hosts: all
   vars_files:
     - vars.yml
@@ -264,24 +244,20 @@
   sudo_user: $username
   tasks:
     # setup smart_sample_patients
-    - name: clone smart_sample_patients git repository
-      action: command
-              creates=$path_to_smart_sample_patients
-              git clone --recursive $smart_sample_patients_repo_url $path_to_smart_sample_patients
-    - name: create sample patients target directory
-      action: file
-              path=$path_to_smart_sample_patients/generated-data
-              owner=$username group=$username mode=0755 state=directory
+    - name: Download Sample Patients
+      command: creates=$path_to_smart_sample_patients
+               git clone --recursive $smart_sample_patients_repo_url $path_to_smart_sample_patients
+    - name: Create Sample Patients Build Directory
+      file: path=$path_to_smart_sample_patients/generated-data
+            owner=$username group=$username mode=0755 state=directory
     # TODO: obviously this shouldn't reference a specific patient file
     #       need a better mechanism for idempotency here
-    - name: run sample patient data generation script
-      action: command
-              chdir=$path_to_smart_sample_patients/bin
-              creates=$path_to_smart_sample_patients/generated-data/p1032702.xml
-              python generate.py --write ../generated-data
-    - name: run sample patient data load script
-      action: shell
-              chdir=$path_to_smart_server
-              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
-              python load_tools/load_one_patient.py
-              $path_to_smart_sample_patients/generated-data/*
+    - name: Build Sample Patients
+      command: chdir=$path_to_smart_sample_patients/bin
+               creates=$path_to_smart_sample_patients/generated-data/p1032702.xml
+               python generate.py --write ../generated-data
+    - name: Load Sample Patient in SMART Server
+      shell: chdir=$path_to_smart_server
+             PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
+             python load_tools/load_one_patient.py
+             $path_to_smart_sample_patients/generated-data/*
