@@ -71,10 +71,10 @@
     - name: Install PostgreSQL
       apt: pkg=postgresql
     - name: Drop Exisiting PostgreSQL Cluster
-      command: "pg_dropcluster --stop {{postgresql_version}} main"
+      command: pg_dropcluster --stop {{postgresql_version}} main
       sudo_user: postgres
     - name: Create PostgreSQL Cluster with UTF-8 Encoding
-      command: "pg_createcluster --start -e UTF-8 {{postgresql_version}} main"
+      command: pg_createcluster --start -e UTF-8 {{postgresql_version}} main
       sudo_user: postgres
     - name: Create PostgreSQL User
       postgresql_user: user="{{username}}" password="{{username}}" role_attr_flags=SUPERUSER
@@ -104,7 +104,7 @@
       sudo_user: "{{username}}"
     - name: Unpack OpenRDF Sesame
       command: chdir="{{userhome}}"
-               "tar -xzvf openrdf-sesame-{{sesame_version}}-sdk.tar.gz"
+               tar -xzvf openrdf-sesame-{{sesame_version}}-sdk.tar.gz
       sudo_user: "{{username}}"
     - name: Create Sesame Data Directory
       file: path=/usr/share/tomcat7/.aduna
@@ -114,7 +114,7 @@
             owner=tomcat7 group=tomcat7 mode=0755 state=directory
     - name: Deploy OpenRDF Sesame on Tomcat
       shell: chdir="{{userhome}}"
-             "cp -f openrdf-sesame-{{sesame_version}}/war/* /var/lib/tomcat7/webapps"
+             cp -f openrdf-sesame-{{sesame_version}}/war/* /var/lib/tomcat7/webapps
       notify:
         - Restart Tomcat
   handlers:
@@ -131,7 +131,7 @@
     # setup smart_server
     - name: Download SMART API Server
       command: creates="{{path_to_smart_server}}"
-               "git clone --recursive {{smart_server_repo_url}} {{path_to_smart_server}}"
+               git clone --recursive {{smart_server_repo_url}} {{path_to_smart_server}}
     - name: Configure SMART API Server
       template: src="templates/{{path_to_smart_server}}/settings.py"
                 dest="{{path_to_smart_server}}/settings.py"
@@ -147,7 +147,7 @@
     # setup smart_ui_server
     - name: Download SMART UI Server
       command: creates="{{path_to_smart_ui_server}}"
-               "git clone --recursive {{smart_ui_server_repo_url}} {{path_to_smart_ui_server}}"
+               git clone --recursive {{smart_ui_server_repo_url}} {{path_to_smart_ui_server}}
     - name: Configure SMART UI Server
       template: src="templates/{{path_to_smart_ui_server}}/settings.py"
                 dest="{{path_to_smart_ui_server}}/settings.py"
@@ -155,7 +155,7 @@
     # setup smart_sample_apps
     - name: Download SMART Sample Apps
       command: creates="{{path_to_smart_sample_apps}}"
-               "git clone --recursive {{smart_sample_apps_repo_url}} {{path_to_smart_sample_apps}}"
+               git clone --recursive {{smart_sample_apps_repo_url}} {{path_to_smart_sample_apps}}
     - name: Configure SMART Sample Apps Server
       template: src="templates/{{path_to_smart_sample_apps}}/settings.py"
                 dest="{{path_to_smart_sample_apps}}/settings.py"
@@ -231,10 +231,10 @@
   tasks:
     - name: Reset SMART API Server
       command: chdir="{{path_to_smart_server}}"
-               "{{path_to_smart_server}}/reset.sh"
+               {{path_to_smart_server}}/reset.sh
     - name: Reset SMART UI Server
       command: chdir="{{path_to_smart_ui_server}}"
-               "{{path_to_smart_ui_server}}/reset.sh"
+               {{path_to_smart_ui_server}}/reset.sh
 
 - name: LOAD SAMPLE PATIENTS
   hosts: all
@@ -246,7 +246,7 @@
     # setup smart_sample_patients
     - name: Download Sample Patients
       command: creates="{{path_to_smart_sample_patients}}"
-               "git clone --recursive {{smart_sample_patients_repo_url}} {{path_to_smart_sample_patients}}"
+               git clone --recursive {{smart_sample_patients_repo_url}} {{path_to_smart_sample_patients}}
     - name: Create Sample Patients Build Directory
       file: path="{{path_to_smart_sample_patients}}/generated-data"
             owner="{{username}}" group="{{username}}" mode=0755 state=directory
@@ -256,8 +256,7 @@
       command: chdir="{{path_to_smart_sample_patients}}/bin"
                creates="{{path_to_smart_sample_patients}}/generated-data/p1032702.xml"
                python generate.py --write ../generated-data
-    - name: Load Sample Patient in SMART Server
+    - name: Load Sample Patients in SMART Server
       shell: chdir="{{path_to_smart_server}}"
              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
-             python load_tools/load_one_patient.py
-             "{{path_to_smart_sample_patients}}/generated-data/*"
+             python load_tools/load_one_patient.py {{path_to_smart_sample_patients}}/generated-data/*
