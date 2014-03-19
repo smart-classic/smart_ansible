@@ -27,14 +27,18 @@ db_password: smart
 
 distro: Ubuntu
 distro_version: 12.04
-username: smart
-userhome: "/home/{{username}}"
+smart_version: 0.6.1
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
 jsonschema_version: 0.7
 httplib2_version: 0.8
 postgresql_version: 9.1
 sesame_version: 2.6.9
+
+git_branch: "tags/v{{smart_version}}"
+username: smart
+userhome: "/home/{{username}}"
+
 smart_server_repo_url: https://github.com/chb/smart_server.git
 smart_ui_server_repo_url: https://github.com/chb/smart_ui_server.git
 smart_sample_apps_repo_url: https://github.com/chb/smart_sample_apps.git
