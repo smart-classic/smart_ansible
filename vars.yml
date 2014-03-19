@@ -25,7 +25,7 @@ db_password: smart
 distro: Ubuntu
 distro_version: 12.04
 username: smart
-userhome: /home/$username
+userhome: "/home/{{username}}"
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
 jsonschema_version: 0.7
@@ -36,15 +36,15 @@ smart_server_repo_url: https://github.com/chb/smart_server.git
 smart_ui_server_repo_url: https://github.com/chb/smart_ui_server.git
 smart_sample_apps_repo_url: https://github.com/chb/smart_sample_apps.git
 smart_sample_patients_repo_url: https://github.com/chb/smart_sample_patients.git
-api_server_base_url: http://$hostname:7000
-ui_server_base_url: http://$hostname:7001
-app_server_base_url: http://$hostname:8001
+api_server_base_url: "http://{{hostname}}:7000"
+ui_server_base_url: "http://{{hostname}}:7001"
+app_server_base_url: "http://{{hostname}}:8001"
 chrome_consumer: chrome
-path_to_smart_sample_apps: $userhome/smart_sample_apps
-path_to_smart_sample_patients: $userhome/smart_sample_patients
-path_to_smart_server: $userhome/smart_server
-path_to_smart_ui_server: $userhome/smart_ui_server
-triplestore_endpoint: http://$hostname:8080/openrdf-sesame/repositories/record_rdf
+path_to_smart_sample_apps: "{{userhome}}/smart_sample_apps"
+path_to_smart_sample_patients: "{{userhome}}/smart_sample_patients"
+path_to_smart_server: "{{userhome}}/smart_server"
+path_to_smart_ui_server: "{{userhome}}/smart_ui_server"
+triplestore_endpoint: "http://{{hostname}}:8080/openrdf-sesame/repositories/record_rdf"
 triplestore_engine: sesame
 #triplestore_password
 #triplestore_username

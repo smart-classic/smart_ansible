@@ -9,8 +9,8 @@
       fail: msg="no hostname variable was specified"
       when: hostname is not defined
     - name: Check Linux Distribution
-      fail: msg="this must be run on an $distro $distro_version system"
-      when: "'$ansible_distribution' != '$distro' or '$ansible_distribution_version' != '$distro_version'"
+      fail: msg="this must be run on an {{distro}} {{distro_version}} system"
+      when: "'{{ansible_distribution}}' != '{{distro}}' or '{{ansible_distribution_version}}' != '{{distro_version}}'"
     - name: Passwordless sudo is Enabled
       action: sudo_passwordless
 
@@ -21,19 +21,19 @@
   sudo: yes
   tasks:
     - name: Create Group
-      group: name=$username
+      group: name="{{username}}"
     - name: Create User
-      user: name=$username password=$password
-            group=$username groups=sudo
+      user: name="{{username}}" password="{{password}}"
+            group="{{username}}" groups=sudo
             shell=/bin/bash
     - name: Configure /etc/sudoers
       copy: src=files/etc/sudoers
             dest=/etc/sudoers
             owner=root group=root mode=0440
     - name: Configure PostgreSQL Account Access
-      template: src=templates/$userhome/.pgpass
-                dest=$userhome/.pgpass
-                owner=$username group=$username mode=0600
+      template: src=templates/"{{userhome}}"/.pgpass
+                dest="{{userhome}}"/.pgpass
+                owner="{{username}}" group="{{username}}" mode=0600
       
 - name: INSTALL REQUIRED PACKAGES
   hosts: all
@@ -60,7 +60,7 @@
     - name: Install Package python-pyparsing
       apt: pkg=python-pyparsing
     - name: "Install Python Packages: rdflib, rdfextras, jsonschema, httplib2"
-      command: easy_install -U "rdflib==$rdflib_version" "rdfextras==$rdfextras_version" "jsonschema==$jsonschema_version" "httplib2==$httplib2_version"
+      command: easy_install -U "rdflib=={{rdflib_version}}" "rdfextras=={{rdfextras_version}}" "jsonschema=={{jsonschema_version}}" "httplib2=={{httplib2_version}}"
 
 - name: SETUP POSTGRESQL
   hosts: all
@@ -71,17 +71,17 @@
     - name: Install PostgreSQL
       apt: pkg=postgresql
     - name: Drop Exisiting PostgreSQL Cluster
-      command: pg_dropcluster --stop $postgresql_version main
+      command: "pg_dropcluster --stop {{postgresql_version main}}"
       sudo_user: postgres
     - name: Create PostgreSQL Cluster with UTF-8 Encoding
-      command: pg_createcluster --start -e UTF-8 $postgresql_version main
+      command: "pg_createcluster --start -e UTF-8 {{postgresql_version main}}"
       sudo_user: postgres
     - name: Create PostgreSQL User
-      postgresql_user: user=$username password=$username role_attr_flags=SUPERUSER
+      postgresql_user: user="{{username}}" password="{{username}}" role_attr_flags=SUPERUSER
       sudo_user: postgres
     - name: Configure PostgreSQL
-      copy: src=files/etc/postgresql/$postgresql_version/main/pg_hba.conf
-            dest=/etc/postgresql/$postgresql_version/main/pg_hba.conf
+      copy: src="files/etc/postgresql/{{postgresql_version}}/main/pg_hba.conf"
+            dest="/etc/postgresql/{{postgresql_version}}/main/pg_hba.conf"
             owner=postgres group=postgres mode=0640
       notify:
         - Restart PostgreSQL
@@ -98,14 +98,14 @@
     - name: Install Tomcat
       apt: pkg=tomcat7
     - name: Download OpenRDF Sesame
-      get_url: url=http://downloads.sourceforge.net/project/sesame/Sesame%202/$sesame_version/openrdf-sesame-${sesame_version}-sdk.tar.gz
-               dest=$userhome/openrdf-sesame-${sesame_version}-sdk.tar.gz
-               owner=$username group=$username mode=0640
-      sudo_user: $username
+      get_url: url="http://downloads.sourceforge.net/project/sesame/Sesame%202/{{sesame_version}}/openrdf-sesame-{{sesame_version}}-sdk.tar.gz"
+               dest="{{userhome}}/openrdf-sesame-{{sesame_version}}-sdk.tar.gz"
+               owner="{{username}}" group="{{username}}" mode=0640
+      sudo_user: "{{username}}"
     - name: Unpack OpenRDF Sesame
-      command: chdir=$userhome
-               tar -xzvf openrdf-sesame-${sesame_version}-sdk.tar.gz
-      sudo_user: $username
+      command: chdir="{{userhome}}"
+               "tar -xzvf openrdf-sesame-{{sesame_version}}-sdk.tar.gz"
+      sudo_user: "{{username}}"
     - name: Create Sesame Data Directory
       file: path=/usr/share/tomcat7/.aduna
             state=absent
@@ -113,8 +113,8 @@
       file: path=/usr/share/tomcat7/.aduna
             owner=tomcat7 group=tomcat7 mode=0755 state=directory
     - name: Deploy OpenRDF Sesame on Tomcat
-      shell: chdir=$userhome
-             cp -f openrdf-sesame-$sesame_version/war/* /var/lib/tomcat7/webapps
+      shell: chdir="{{userhome}}"
+             "cp -f openrdf-sesame-{{sesame_version}}/war/* /var/lib/tomcat7/webapps"
       notify:
         - Restart Tomcat
   handlers:
@@ -126,40 +126,40 @@
   vars_files:
     - vars.yml
   sudo: yes
-  sudo_user: $username
+  sudo_user: "{{username}}"
   tasks:
     # setup smart_server
     - name: Download SMART API Server
-      command: creates=$path_to_smart_server
-               git clone --recursive $smart_server_repo_url $path_to_smart_server
+      command: creates="{{path_to_smart_server}}"
+               "git clone --recursive {{smart_server_repo_url}} {{path_to_smart_server}}"
     - name: Configure SMART API Server
-      template: src=templates/$path_to_smart_server/settings.py
-                dest=$path_to_smart_server/settings.py
-                owner=$username group=$username mode=0644
+      template: src="templates/{{path_to_smart_server}}/settings.py"
+                dest="{{path_to_smart_server}}/settings.py"
+                owner="{{username}}" group="{{username}}" mode=0644
     - name: Configure Application List
-      template: src=templates/$path_to_smart_server/bootstrap_helpers/application_list.json
-                dest=$path_to_smart_server/bootstrap_helpers/application_list.json
-                owner=$username group=$username mode=0644
+      template: src="templates/{{path_to_smart_server}}/bootstrap_helpers/application_list.json"
+                dest="{{path_to_smart_server}}/bootstrap_helpers/application_list.json"
+                owner="{{username}}" group="{{username}}" mode=0644
     - name: Configure Bootstrap Applications
-      template: src=templates/$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
-                dest=$path_to_smart_server/bootstrap_helpers/bootstrap_applications.py
-                owner=$username group=$username mode=0644
+      template: src="templates/{{path_to_smart_server}}/bootstrap_helpers/bootstrap_applications.py"
+                dest="{{path_to_smart_server}}/bootstrap_helpers/bootstrap_applications.py"
+                owner="{{username}}" group="{{username}}" mode=0644
     # setup smart_ui_server
     - name: Download SMART UI Server
-      command: creates=$path_to_smart_ui_server
-               git clone --recursive $smart_ui_server_repo_url $path_to_smart_ui_server
+      command: creates="{{path_to_smart_ui_server}}"
+               "git clone --recursive {{smart_ui_server_repo_url}} {{path_to_smart_ui_server}}"
     - name: Configure SMART UI Server
-      template: src=templates/$path_to_smart_ui_server/settings.py
-                dest=$path_to_smart_ui_server/settings.py
-                owner=$username group=$username mode=0644
+      template: src="templates/{{path_to_smart_ui_server}}/settings.py"
+                dest="{{path_to_smart_ui_server}}/settings.py"
+                owner="{{username}}" group="{{username}}" mode=0644
     # setup smart_sample_apps
     - name: Download SMART Sample Apps
-      command: creates=$path_to_smart_sample_apps
-               git clone --recursive $smart_sample_apps_repo_url $path_to_smart_sample_apps
+      command: creates="{{path_to_smart_sample_apps}}"
+               "git clone --recursive {{smart_sample_apps_repo_url}} {{path_to_smart_sample_apps}}"
     - name: Configure SMART Sample Apps Server
-      template: src=templates/$path_to_smart_sample_apps/settings.py
-                dest=$path_to_smart_sample_apps/settings.py
-                owner=$username group=$username mode=0644
+      template: src="templates/{{path_to_smart_sample_apps}}/settings.py"
+                dest="{{path_to_smart_sample_apps}}/settings.py"
+                owner="{{username}}" group="{{username}}" mode=0644
 
 - name: SETUP APACHE
   hosts: all
@@ -227,37 +227,37 @@
   vars_files:
     - vars.yml
   sudo: yes
-  sudo_user: $username
+  sudo_user: "{{username}}"
   tasks:
     - name: Reset SMART API Server
-      command: chdir=$path_to_smart_server
-               $path_to_smart_server/reset.sh
+      command: chdir="{{path_to_smart_server}}"
+               "{{path_to_smart_server}}/reset.sh"
     - name: Reset SMART UI Server
-      command: chdir=$path_to_smart_ui_server
-               $path_to_smart_ui_server/reset.sh
+      command: chdir="{{path_to_smart_ui_server}}"
+               "{{path_to_smart_ui_server}}/reset.sh"
 
 - name: LOAD SAMPLE PATIENTS
   hosts: all
   vars_files:
     - vars.yml
   sudo: yes
-  sudo_user: $username
+  sudo_user: "{{username}}"
   tasks:
     # setup smart_sample_patients
     - name: Download Sample Patients
-      command: creates=$path_to_smart_sample_patients
-               git clone --recursive $smart_sample_patients_repo_url $path_to_smart_sample_patients
+      command: creates="{{path_to_smart_sample_patients}}"
+               "git clone --recursive {{smart_sample_patients_repo_url}} {{path_to_smart_sample_patients}}"
     - name: Create Sample Patients Build Directory
-      file: path=$path_to_smart_sample_patients/generated-data
-            owner=$username group=$username mode=0755 state=directory
+      file: path="{{path_to_smart_sample_patients}}/generated-data"
+            owner="{{username}}" group="{{username}}" mode=0755 state=directory
     # TODO: obviously this shouldn't reference a specific patient file
     #       need a better mechanism for idempotency here
     - name: Build Sample Patients
-      command: chdir=$path_to_smart_sample_patients/bin
-               creates=$path_to_smart_sample_patients/generated-data/p1032702.xml
+      command: chdir="{{path_to_smart_sample_patients}}/bin"
+               creates="{{path_to_smart_sample_patients}}/generated-data/p1032702.xml"
                python generate.py --write ../generated-data
     - name: Load Sample Patient in SMART Server
-      shell: chdir=$path_to_smart_server
+      shell: chdir="{{path_to_smart_server}}"
              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
              python load_tools/load_one_patient.py
-             $path_to_smart_sample_patients/generated-data/*
+             "{{path_to_smart_sample_patients}}/generated-data/*"
