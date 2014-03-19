@@ -71,10 +71,10 @@
     - name: Install PostgreSQL
       apt: pkg=postgresql
     - name: Drop Exisiting PostgreSQL Cluster
-      command: "pg_dropcluster --stop {{postgresql_version main}}"
+      command: "pg_dropcluster --stop {{postgresql_version}} main"
       sudo_user: postgres
     - name: Create PostgreSQL Cluster with UTF-8 Encoding
-      command: "pg_createcluster --start -e UTF-8 {{postgresql_version main}}"
+      command: "pg_createcluster --start -e UTF-8 {{postgresql_version}} main"
       sudo_user: postgres
     - name: Create PostgreSQL User
       postgresql_user: user="{{username}}" password="{{username}}" role_attr_flags=SUPERUSER
