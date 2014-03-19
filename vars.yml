@@ -12,6 +12,9 @@
 # installed.  the default here is 'smart' with a salt of 'smart'.
 password: smLdEYw5NOy2k
 
+# seed Django's secret here
+django_secret_key: pNsj42f21Qs29451
+
 # the consumer secret for OAuth
 chrome_secret: chrome
 

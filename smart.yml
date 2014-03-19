@@ -133,23 +133,26 @@
       command: creates="{{path_to_smart_server}}"
                git clone --recursive {{smart_server_repo_url}} {{path_to_smart_server}}
     - name: Configure SMART API Server
-      template: src="templates/{{path_to_smart_server}}/settings.py"
+      template: src="templates/config/api_settings.py"
                 dest="{{path_to_smart_server}}/settings.py"
                 owner="{{username}}" group="{{username}}" mode=0644
     - name: Configure Application List
-      template: src="templates/{{path_to_smart_server}}/bootstrap_helpers/application_list.json"
+      template: src="templates/config/application_list.json"
                 dest="{{path_to_smart_server}}/bootstrap_helpers/application_list.json"
                 owner="{{username}}" group="{{username}}" mode=0644
     - name: Configure Bootstrap Applications
-      template: src="templates/{{path_to_smart_server}}/bootstrap_helpers/bootstrap_applications.py"
+      template: src="templates/config/bootstrap_applications.py"
                 dest="{{path_to_smart_server}}/bootstrap_helpers/bootstrap_applications.py"
                 owner="{{username}}" group="{{username}}" mode=0644
+    - name: Setup Link to SMART Manager
+      command: creates="{{userhome}}/smart_manager.py"
+               ln -s {{path_to_smart_server}}/load_tools/smart_manager.py {{userhome}}/smart_manager.py
     # setup smart_ui_server
     - name: Download SMART UI Server
       command: creates="{{path_to_smart_ui_server}}"
                git clone --recursive {{smart_ui_server_repo_url}} {{path_to_smart_ui_server}}
     - name: Configure SMART UI Server
-      template: src="templates/{{path_to_smart_ui_server}}/settings.py"
+      template: src="templates/config/ui_settings.py"
                 dest="{{path_to_smart_ui_server}}/settings.py"
                 owner="{{username}}" group="{{username}}" mode=0644
     # setup smart_sample_apps
@@ -157,7 +160,7 @@
       command: creates="{{path_to_smart_sample_apps}}"
                git clone --recursive {{smart_sample_apps_repo_url}} {{path_to_smart_sample_apps}}
     - name: Configure SMART Sample Apps Server
-      template: src="templates/{{path_to_smart_sample_apps}}/settings.py"
+      template: src="templates/config/apps_settings.py"
                 dest="{{path_to_smart_sample_apps}}/settings.py"
                 owner="{{username}}" group="{{username}}" mode=0644
 

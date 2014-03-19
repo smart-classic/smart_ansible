@@ -79,3 +79,6 @@ then
 fi
 
 export ANSIBLE_HOSTS="$DIRNAME/hosts"
+
+cd $DIRNAME
+./fetch-templates.sh
