@@ -263,4 +263,4 @@
     - name: Load Sample Patients in SMART Server
       shell: chdir="{{path_to_smart_server}}"
              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
-             python load_tools/load_one_patient.py {{path_to_smart_sample_patients}}/generated-data/*
+             python load_tools/load_one_patient.py {{path_to_smart_sample_patients}}/generated-data/* {{path_to_smart_sample_patients}}/deidentified-patients/*
