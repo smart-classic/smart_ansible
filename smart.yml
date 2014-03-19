@@ -256,6 +256,10 @@
       command: chdir="{{path_to_smart_sample_patients}}/bin"
                creates="{{path_to_smart_sample_patients}}/generated-data/p1032702.xml"
                python generate.py --write ../generated-data
+    - name: Generate Vitals Patient
+      command: chdir="{{path_to_smart_sample_patients}}/bin"
+               creates="{{path_to_smart_sample_patients}}/generated-data/99912345.xml"
+               python generate-vitals-patient.py ../generated-data/99912345.xml
     - name: Load Sample Patients in SMART Server
       shell: chdir="{{path_to_smart_server}}"
              PYTHONPATH=.:.. DJANGO_SETTINGS_MODULE=settings
