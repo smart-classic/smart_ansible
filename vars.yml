@@ -36,7 +36,7 @@ httplib2_version: 0.8
 postgresql_version: 9.1
 sesame_version: 2.6.9
 
-git_branch: "dev"
+git_branch: "tags/v{{smart_version}}"
 username: smart
 userhome: "/home/{{username}}"
 
