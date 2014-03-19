@@ -9,18 +9,19 @@
 #hostname: 134.174.151.46
 
 # the UNIX-crypted password for the system user under which SMART is
-# installed.  the default here is 'smart' with a salt of 'smart'.
+# installed.
 password: smLdEYw5NOy2k
 
 # seed Django's secret here
 django_secret_key: pNsj42f21Qs29451
 
-# the consumer secret for OAuth
-chrome_secret: chrome
+# the consumer secrets for OAuth
+chrome_secret: yGr8w4234dEd
+apiverifier_secret: 4prW6U29erf
 
 # the PostgreSQL database password for the smart and smart-ui
 # databases
-db_password: smart
+db_password: hgE602fEjhaMv
 
 ### the following variables are not likely to change frequently but
 ### may be customized if necessary.
@@ -35,7 +36,7 @@ httplib2_version: 0.8
 postgresql_version: 9.1
 sesame_version: 2.6.9
 
-git_branch: "tags/v{{smart_version}}"
+git_branch: "dev"
 username: smart
 userhome: "/home/{{username}}"
 
@@ -46,11 +47,12 @@ smart_sample_patients_repo_url: https://github.com/chb/smart_sample_patients.git
 api_server_base_url: "http://{{hostname}}:7000"
 ui_server_base_url: "http://{{hostname}}:7001"
 app_server_base_url: "http://{{hostname}}:8001"
-chrome_consumer: chrome
+chrome_consumer: chrome 
 path_to_smart_sample_apps: "{{userhome}}/smart_sample_apps"
 path_to_smart_sample_patients: "{{userhome}}/smart_sample_patients"
 path_to_smart_server: "{{userhome}}/smart_server"
 path_to_smart_ui_server: "{{userhome}}/smart_ui_server"
+path_to_api_verifier: "{{path_to_smart_sample_apps}}/api_verify"
 triplestore_endpoint: "http://{{hostname}}:8080/openrdf-sesame/repositories/record_rdf"
 triplestore_engine: sesame
 #triplestore_password

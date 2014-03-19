@@ -1,3 +1,6 @@
+WSGIPassAuthorization On
+NameVirtualHost *:9003
+
 <VirtualHost *:9003>
 	ServerName {{hostname}}
 	ServerAdmin admin@{{hostname}}

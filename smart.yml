@@ -59,6 +59,10 @@
       apt: pkg=python-setuptools
     - name: Install Package python-pyparsing
       apt: pkg=python-pyparsing
+    - name: Install Package python-webpy
+      apt: pkg=python-webpy
+    - name: Install Package python-dateutil
+      apt: pkg=python-dateutil
     - name: "Install Python Packages: rdflib, rdfextras, jsonschema, httplib2"
       command: easy_install -U "rdflib=={{rdflib_version}}" "rdfextras=={{rdfextras_version}}" "jsonschema=={{jsonschema_version}}" "httplib2=={{httplib2_version}}"
 
@@ -77,7 +81,7 @@
       command: pg_createcluster --start -e UTF-8 {{postgresql_version}} main
       sudo_user: postgres
     - name: Create PostgreSQL User
-      postgresql_user: user="{{username}}" password="{{username}}" role_attr_flags=SUPERUSER
+      postgresql_user: user="{{username}}" password="{{db_password}}" role_attr_flags=SUPERUSER
       sudo_user: postgres
     - name: Configure PostgreSQL
       copy: src="files/etc/postgresql/{{postgresql_version}}/main/pg_hba.conf"
@@ -172,6 +176,10 @@
       template: src="templates/config/apps_settings.py"
                 dest="{{path_to_smart_sample_apps}}/settings.py"
                 owner="{{username}}" group="{{username}}" mode=0644
+    - name: Configure API Verifier
+      template: src="templates/config/api_verify.py"
+                dest="{{path_to_smart_sample_apps}}/api_verify/settings.py"
+                owner="{{username}}" group="{{username}}" mode=0644
 
 - name: SETUP APACHE
   hosts: all
@@ -189,14 +197,20 @@
       copy: src=files/etc/apache2/ports.conf
             dest=/etc/apache2/ports.conf
             owner=root group=root mode=0644
+      notify:
+        - Restart Apache
     - name: Setup Virtual Host for API Verifier App
       template: src=templates/etc/apache2/sites-available/api-verify
                 dest=/etc/apache2/sites-available/api-verify
                 owner=root group=root mode=0644
+      notify:
+        - Restart Apache
     - name: Setup Virtual Host for MPR Monitor App
       template: src=templates/etc/apache2/sites-available/mpr-monitor
                 dest=/etc/apache2/sites-available/mpr-monitor
                 owner=root group=root mode=0644
+      notify:
+        - Restart Apache
 #    - name: install rxreminder app virtual host configuration file
 #      template: src=templates/etc/apache2/sites-available/rxreminder
 #                dest=/etc/apache2/sites-available/rxreminder
@@ -209,17 +223,25 @@
       file: src=/etc/apache2/mods-available/rewrite.load
             path=/etc/apache2/mods-enabled/rewrite.load
             owner=root group=root state=link
+      notify:
+        - Restart Apache
     - name: Disable Default Virtual Host
       file: path=/etc/apache2/sites-enabled/000-default
             state=absent
+      notify:
+        - Restart Apache
     - name: Enable Virtual Host for SMART Servers
       file: src=/etc/apache2/sites-available/smart-servers
             path=/etc/apache2/sites-enabled/001-smart-servers
             owner=root group=root state=link
+      notify:
+        - Restart Apache
     - name: Enable Virtual Host for API Verifier
       file: src=/etc/apache2/sites-available/api-verify
             path=/etc/apache2/sites-enabled/002-api-verify
             owner=root group=root state=link
+      notify:
+        - Restart Apache
     - name: Enable Virtual Host for MPR Monitor
       file: src=/etc/apache2/sites-available/mpr-monitor
             path=/etc/apache2/sites-enabled/003-mpr-monitor
@@ -243,10 +265,16 @@
   tasks:
     - name: Reset SMART API Server
       command: chdir="{{path_to_smart_server}}"
-               {{path_to_smart_server}}/reset.sh
+               ./reset.sh
     - name: Reset SMART UI Server
       command: chdir="{{path_to_smart_ui_server}}"
-               {{path_to_smart_ui_server}}/reset.sh
+               ./reset.sh
+    - name: Load API Verifier into SMART API Server
+      environment:
+        PYTHONPATH: .:..
+        DJANGO_SETTINGS_MODULE: settings
+      command: chdir="{{path_to_smart_server}}"
+               python load_tools/load_one_app.py http://localhost:9001/static/smart_manifest_local.json {{apiverifier_secret}}
 
 - name: LOAD SAMPLE PATIENTS
   hosts: all

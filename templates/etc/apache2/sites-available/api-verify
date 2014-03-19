@@ -1,25 +1,27 @@
+WSGIPassAuthorization On
+NameVirtualHost *:9001
+
 <VirtualHost *:9001>
 	ServerName {{hostname}}
 	ServerAdmin admin@{{hostname}}
 
-	DocumentRoot {{path_to_smart_sample_apps}}/api_verify
-	<Directory />
-		Options FollowSymLinks
-		AllowOverride All
-	</Directory>
-	<Directory {{path_to_smart_sample_apps}}/api_verify/>
-		Options Indexes FollowSymLinks MultiViews
-		AllowOverride All
-		Order allow,deny
-		allow from all
-	</Directory>
+    WSGIScriptAlias / {{path_to_smart_sample_apps}}/api_verify/main.py/ 
+    WSGIApplicationGroup %{GLOBAL}
+    WSGIDaemonProcess apiverify user=smart home={{path_to_smart_sample_apps}}/api_verify/ python-path=.:..
+    WSGIProcessGroup apiverify
 
-	ErrorLog /var/log/apache2/apiverify.bugs.log
+    Alias /static {{path_to_smart_sample_apps}}/api_verify/static 
+    AddType text/html .py	
 
-	
-	# Possible values include: debug, info, notice, warn, error, crit,
-	# alert, emerg.
-	LogLevel warn
-	CustomLog /var/log/apache2/apiverify.log combined
+    <Directory {{path_to_smart_sample_apps}}/api_verify/>
+		Order deny,allow
+		Allow from all
+    </Directory>
 
+    ErrorLog /var/log/apache2/apiverify.bugs.log
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+    CustomLog /var/log/apache2/apiverify.log combined
 </VirtualHost>
