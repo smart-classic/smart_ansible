@@ -31,7 +31,7 @@ db_password: hgE602fEjhaMv
 
 distro: Ubuntu
 distro_version: 12.04
-smart_version: 0.6.1
+smart_version: 0.6.2
 rdflib_version: 3.2.3
 rdfextras_version: 0.2
 jsonschema_version: 0.7

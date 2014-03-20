@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dir=${1-templates/config}
-branch=${2-v0.6.1}
+branch=${2-v0.6.2}
 
 # Download configuration templates for SMART Servers
 mkdir $dir
