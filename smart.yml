@@ -139,6 +139,10 @@
     - name: Checkout SMART API Server Version {{smart_version}}
       command: chdir="{{path_to_smart_server}}"
                git checkout {{git_branch}}
+      command: chdir="{{path_to_smart_server}}"
+               git pull
+      command: chdir="{{path_to_smart_server}}"
+               git submodule update --init --recursive
     - name: Configure SMART API Server
       template: src="templates/config/api_settings.py"
                 dest="{{path_to_smart_server}}/settings.py"
@@ -161,6 +165,10 @@
     - name: Checkout SMART UI Server Version {{smart_version}}
       command: chdir="{{path_to_smart_ui_server}}"
                git checkout {{git_branch}}
+      command: chdir="{{path_to_smart_ui_server}}"
+               git pull
+      command: chdir="{{path_to_smart_ui_server}}"
+               git submodule update --init --recursive
     - name: Configure SMART UI Server
       template: src="templates/config/ui_settings.py"
                 dest="{{path_to_smart_ui_server}}/settings.py"
@@ -172,6 +180,10 @@
     - name: Checkout SMART Sample Apps Version {{smart_version}}
       command: chdir="{{path_to_smart_sample_apps}}"
                git checkout {{git_branch}}
+      command: chdir="{{path_to_smart_sample_apps}}"
+               git pull
+      command: chdir="{{path_to_smart_sample_apps}}"
+               git submodule update --init --recursive
     - name: Configure SMART Sample Apps Server
       template: src="templates/config/apps_settings.py"
                 dest="{{path_to_smart_sample_apps}}/settings.py"
@@ -296,6 +308,10 @@
     - name: Checkout Sample Patients Version {{smart_version}}
       command: chdir="{{path_to_smart_sample_patients}}"
                git checkout {{git_branch}}
+      command: chdir="{{path_to_smart_sample_patients}}"
+               git pull
+      command: chdir="{{path_to_smart_sample_patients}}"
+               git submodule update --init --recursive
     - name: Create Sample Patients Build Directory
       file: path="{{path_to_smart_sample_patients}}/generated-data"
             owner="{{username}}" group="{{username}}" mode=0755 state=directory
