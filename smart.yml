@@ -275,6 +275,12 @@
         DJANGO_SETTINGS_MODULE: settings
       command: chdir="{{path_to_smart_server}}"
                python load_tools/load_one_app.py http://localhost:9001/static/smart_manifest_local.json {{apiverifier_secret}}
+    - name: Load MPR Monitor into SMART API Server
+      environment:
+        PYTHONPATH: .:..
+        DJANGO_SETTINGS_MODULE: settings
+      command: chdir="{{path_to_smart_server}}"
+               python load_tools/load_one_app.py http://localhost:9002/smartapp/smart_manifest.json smartapp-secret
 
 - name: LOAD SAMPLE PATIENTS
   hosts: all
