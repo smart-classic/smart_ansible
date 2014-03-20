@@ -8,6 +8,9 @@
 #hostname: localhost
 #hostname: 134.174.151.46
 
+# customizes the branding label
+pretty_name_value: "VM"
+
 # the UNIX-crypted password for the system user under which SMART is
 # installed.
 password: smLdEYw5NOy2k
