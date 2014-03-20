@@ -1,0 +1,9 @@
+#!/bin/sh
+
+        echo
+        echo "Welcome to the SMART {{smart_version}} Virtual Machine!"
+        echo "www.smartplatforms.org"
+        echo
+        echo "To get started browse to: http://localhost:7001"
+        echo
+        echo "Note: logs files are available in /var/log/apache2"

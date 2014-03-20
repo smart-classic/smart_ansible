@@ -13,6 +13,30 @@
       when: "'{{ansible_distribution}}' != '{{distro}}' or '{{ansible_distribution_version}}' != '{{distro_version}}'"
     - name: Passwordless sudo is Enabled
       action: sudo_passwordless
+      
+- name: CONFIGURE SERVER
+  hosts: all
+  vars_files:
+    - vars.yml
+  sudo: yes
+  tasks:
+    - name: Delete Unnecessary MOTD Items
+      file: path=/etc/update-motd.d/{{item}} state=absent
+      with_items:
+         - 00-header
+         - 50-landscape-sysinfo
+         - 51-cloudguest
+         - 98-cloudguest
+    - name: Configure SMART VM User Greeting
+      template: src=templates/etc/update-motd.d/10-help-text
+                dest=/etc/update-motd.d/10-help-text
+    - name: Disable Bootloader Menu Screen
+      copy: src=files/etc/default/grub
+            dest=/etc/default/grub
+      notify: Update Bootloader
+  handlers:
+    - name: Update Bootloader
+      command: update-grub
 
 - name: SETUP USER/GROUP
   hosts: all
@@ -47,22 +71,17 @@
       apt: upgrade=full
     - name: Install GIT
       apt: pkg=git
-    - name: Install Django
-      apt: pkg=python-django
-    - name: Install Package python-psycopg2
-      apt: pkg=python-psycopg2
-    - name: Install Package python-m2crypto
-      apt: pkg=python-m2crypto
-    - name: Install Package python-simplejson
-      apt: pkg=python-simplejson
-    - name: Install Package python-setuptools
-      apt: pkg=python-setuptools
-    - name: Install Package python-pyparsing
-      apt: pkg=python-pyparsing
-    - name: Install Package python-webpy
-      apt: pkg=python-webpy
-    - name: Install Package python-dateutil
-      apt: pkg=python-dateutil
+    - name: Install APT Packages
+      apt: pkg={{item}}
+      with_items:
+         - python-django
+         - python-psycopg2
+         - python-m2crypto
+         - python-simplejson
+         - python-setuptools
+         - python-pyparsing
+         - python-webpy
+         - python-dateutil
     - name: "Install Python Packages: rdflib, rdfextras, jsonschema, httplib2"
       command: easy_install -U "rdflib=={{rdflib_version}}" "rdfextras=={{rdfextras_version}}" "jsonschema=={{jsonschema_version}}" "httplib2=={{httplib2_version}}"
 
