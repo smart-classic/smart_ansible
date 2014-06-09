@@ -43,10 +43,10 @@ git_branch: "tags/v{{smart_version}}"
 username: smart
 userhome: "/home/{{username}}"
 
-smart_server_repo_url: https://github.com/chb/smart_server.git
-smart_ui_server_repo_url: https://github.com/chb/smart_ui_server.git
-smart_sample_apps_repo_url: https://github.com/chb/smart_sample_apps.git
-smart_sample_patients_repo_url: https://github.com/chb/smart_sample_patients.git
+smart_server_repo_url: https://github.com/smart-platforms/smart_server.git
+smart_ui_server_repo_url: https://github.com/smart-platforms/smart_ui_server.git
+smart_sample_apps_repo_url: https://github.com/smart-platforms/smart_sample_apps.git
+smart_sample_patients_repo_url: https://github.com/smart-platforms/smart_sample_patients.git
 api_server_base_url: "http://{{hostname}}:7000"
 ui_server_base_url: "http://{{hostname}}:7001"
 app_server_base_url: "http://{{hostname}}:8001"
